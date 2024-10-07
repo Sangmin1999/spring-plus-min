@@ -54,31 +54,17 @@ public class TodoService {
     public Page<TodoResponse> getTodos(int page, int size, String weather, LocalDateTime startDate, LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        if (weather == null && startDate == null && endDate == null) {
-            // 날씨 조건과 기간 필터가 없으면 모든 할 일을 modifiedAt 기준으로 내림차순 정렬하여 조회함.
-            Page<Todo> todos = todoRepository.findAllByOrderByModifiedAtDesc(pageable);
 
-            return todos.map(todo -> new TodoResponse(
-                    todo.getId(),
-                    todo.getTitle(),
-                    todo.getContents(),
-                    todo.getWeather(),
-                    new UserResponse(todo.getUser().getId(), todo.getUser().getEmail()),
-                    todo.getCreatedAt(),
-                    todo.getModifiedAt()
-            ));
-        } else {
-            Page<Todo> todos = todoRepository.findByConditions(weather, startDate, endDate, pageable);
-            return todos.map(todo -> new TodoResponse(
-                    todo.getId(),
-                    todo.getTitle(),
-                    todo.getContents(),
-                    todo.getWeather(),
-                    new UserResponse(todo.getUser().getId(), todo.getUser().getEmail()),
-                    todo.getCreatedAt(),
-                    todo.getModifiedAt()
-            ));
-        }
+        Page<Todo> todos = todoRepository.findByConditions(weather, startDate, endDate, pageable);
+        return todos.map(todo -> new TodoResponse(
+                todo.getId(),
+                todo.getTitle(),
+                todo.getContents(),
+                todo.getWeather(),
+                new UserResponse(todo.getUser().getId(), todo.getUser().getEmail()),
+                todo.getCreatedAt(),
+                todo.getModifiedAt()
+        ));
     }
 
     public TodoResponse getTodo(long todoId) {
@@ -104,8 +90,7 @@ public class TodoService {
             String titleKeyword,
             String managerNickname,
             LocalDateTime startDate,
-            LocalDateTime endDate)
-    {
+            LocalDateTime endDate) {
         Pageable pageable = PageRequest.of(page - 1, size);
         return todoRepository.searchTodos(titleKeyword, managerNickname, startDate, endDate, pageable);
     }
